@@ -64,7 +64,7 @@ footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
 <script>
 const R={todos:"Todos",fav:"★ Favoritos",eua:"🇺🇸 EUA",brasil:"🇧🇷 Brasil",europa:"🇪🇺 Europa",asia:"🌏 Ásia",mundo:"🌐 Commodities & Cripto"};
 const $=id=>document.getElementById(id),INT=600;
-const DATA_URL="data/data.json";
+const DATA_URL=location.hostname.endsWith(".github.io")||["localhost","127.0.0.1"].includes(location.hostname)?"data/data.json":"/api/data";
 let D=null,reg=(location.hash.slice(1)in R)?location.hash.slice(1):"todos",left=INT,loading=false,loadError=false;
 let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
 const nf=(v,d=2)=>v==null?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -90,7 +90,8 @@ function updateStatus(){
 async function load(){
  if(loading)return;loading=true;loadError=false;$("st").textContent="Atualizando dados…";
  try{
-  const r=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});
+  const isStaticData=DATA_URL.endsWith(".json");
+  const r=await fetch(isStaticData?DATA_URL+"?t="+Date.now():DATA_URL,{cache:isStaticData?"no-store":"default"});
   if(!r.ok)throw new Error(`HTTP ${r.status}`);
   const data=await r.json();
   if(!data||!Array.isArray(data.quotes)||!Array.isArray(data.macro)||!Array.isArray(data.news))throw new Error("Formato de dados inválido");

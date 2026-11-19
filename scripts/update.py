@@ -62,15 +62,24 @@ def feed(f):
         print("erro feed", src, e)
     return out[:25]
 
-with ThreadPoolExecutor(12) as ex:
-    quotes = [q for q in ex.map(quote, QUOTES) if q]
-    macro = [m for m in ex.map(bcb, BCB) if m]
-    news, seen = [], set()
-    for lst in ex.map(feed, FEEDS):
-        for n in lst:
-            k = n["title"].lower()[:60]
-            if k not in seen: seen.add(k); news.append(n)
-news.sort(key=lambda n: n["ts"], reverse=True)
-json.dump(dict(updated=dt.datetime.now(dt.timezone.utc).isoformat(), quotes=quotes, macro=macro, news=news[:150]),
-          open("data/data.json","w"), ensure_ascii=False, separators=(",",":"))
-print(len(quotes), "cotações,", len(news), "notícias")
+def collect_data():
+    with ThreadPoolExecutor(12) as ex:
+        quotes = [q for q in ex.map(quote, QUOTES) if q]
+        macro = [m for m in ex.map(bcb, BCB) if m]
+        news, seen = [], set()
+        for lst in ex.map(feed, FEEDS):
+            for n in lst:
+                k = n["title"].lower()[:60]
+                if k not in seen: seen.add(k); news.append(n)
+    news.sort(key=lambda n: n["ts"], reverse=True)
+    return dict(updated=dt.datetime.now(dt.timezone.utc).isoformat(), quotes=quotes,
+                macro=macro, news=news[:150])
+
+def main():
+    data = collect_data()
+    with open("data/data.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, separators=(",",":"))
+    print(len(data["quotes"]), "cotações,", len(data["news"]), "notícias")
+
+if __name__ == "__main__":
+    main()
