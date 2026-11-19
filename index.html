@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Macro Radar — Economia global em tempo real: EUA, Brasil, Europa e Ásia</title>
+<meta name="description" content="Índices globais, câmbio, commodities, cripto e notícias de economia com foco em EUA e Brasil. Dados públicos atualizados a cada 10 minutos.">
+<meta name="keywords" content="economia global, Ibovespa, S&P 500, dólar, Selic, notícias econômicas, mercados">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#0b1220">
+<link rel="canonical" href="https://ThiagoBorzaquel.github.io/macro-radar/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<meta property="og:type" content="website"><meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Macro Radar — Economia global em tempo real">
+<meta property="og:description" content="Índices, câmbio, commodities e notícias. EUA, Brasil, Europa e Ásia.">
+<meta property="og:url" content="https://ThiagoBorzaquel.github.io/macro-radar/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Macro Radar","url":"https://ThiagoBorzaquel.github.io/macro-radar/","inLanguage":"pt-BR","description":"Agregador de índices e notícias da economia global com dados públicos."}</script>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--tx:#0f1a2b;--mu:#5b6b82;--bd:#dde3ec;--up:#0a8f4e;--dn:#d62f3f;--ac:#1d5fd6}
+:root[data-theme=dark]{--bg:#0b1220;--card:#111b2e;--tx:#e8eef9;--mu:#8fa0ba;--bd:#22304a;--up:#2ed17f;--dn:#ff5d6c;--ac:#6ea2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:inherit;text-decoration:none}.w{max-width:1200px;margin:0 auto;padding:0 14px}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--bd)}
+.top{display:flex;align-items:center;gap:10px;padding:10px 0;flex-wrap:wrap}.logo{font-weight:800;font-size:19px}.logo b{color:var(--ac)}
+.sp{flex:1}.st{font-size:12px;color:var(--mu)}button,input{font:inherit;color:var(--tx)}
+.btn{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;cursor:pointer}
+nav{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px}nav button{white-space:nowrap;background:none;border:1px solid var(--bd);border-radius:99px;padding:5px 13px;cursor:pointer}
+nav button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.tick{display:flex;gap:22px;overflow-x:auto;padding:8px 0;font-size:13px;white-space:nowrap}
+h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:22px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.q{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;position:relative}
+.q .n{font-size:13px;color:var(--mu)}.q .p{font-size:21px;font-weight:700;margin:2px 0}.q .c{font-size:13px;font-weight:600}
+.q svg{position:absolute;right:10px;bottom:10px;width:70px;height:30px}.q .f{position:absolute;right:8px;top:6px;cursor:pointer;opacity:.5;background:none;border:0}.q .f.on{opacity:1}
+.up{color:var(--up)}.dn{color:var(--dn)}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:18px}@media(max-width:820px){.cols{grid-template-columns:1fr}}
+.news{background:var(--card);border:1px solid var(--bd);border-radius:12px}
+.news a{display:block;padding:11px 14px;border-bottom:1px solid var(--bd)}.news a:last-child{border:0}.news a:hover{background:var(--bg)}
+.meta{font-size:12px;color:var(--mu);margin-top:3px}.tag{display:inline-block;font-size:11px;border-radius:5px;padding:0 6px;background:var(--bg);border:1px solid var(--bd);margin-right:6px}
+.mac{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:6px 14px}.mac div{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)}.mac div:last-child{border:0}
+input[type=search]{width:100%;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin-bottom:10px}
+footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
+</style>
+</head>
+<body>
+<header><div class="w">
+ <div class="top"><span class="logo">📈 Macro<b>Radar</b></span><span class="sp"></span>
+  <span class="st" id="st">carregando…</span><button class="btn" id="rf" title="Atualizar agora">⟳</button><button class="btn" id="th" title="Tema">◐</button></div>
+ <nav id="nav"></nav>
+</div><div class="w tick" id="tick" aria-label="Destaques"></div></header>
+<main class="w">
+ <h1 style="font-size:22px;margin:18px 0 0">Economia global em tempo real</h1>
+ <p class="st">Índices, câmbio, commodities e notícias com foco em EUA e Brasil. Fontes públicas, atualização a cada 10 minutos.</p>
+ <h2>Mercados</h2><div class="grid" id="mk"></div>
+ <div class="cols">
+  <section><h2>Notícias</h2><input type="search" id="q" placeholder="Buscar notícias (ex.: Fed, Selic, petróleo)…" aria-label="Buscar"><div class="news" id="nw"></div></section>
+  <aside><h2>Brasil · Banco Central</h2><div class="mac" id="mc"></div><h2>Sobre</h2>
+   <p class="st">Cotações: Yahoo Finance (gráfico público, pode ter atraso de ~15 min). Macro: API SGS do Banco Central do Brasil. Notícias: RSS públicos (BBC, CNBC, G1, InfoMoney, Google News). Os links levam à fonte original. Conteúdo informativo, não é recomendação de investimento.</p></aside>
+ </div>
+ <noscript>Ative o JavaScript para ver os dados de mercado.</noscript>
+</main>
+<footer class="w">© Macro Radar · Dados públicos de terceiros; sem garantia de exatidão ou disponibilidade.</footer>
+<script>
+const R={todos:"Todos",fav:"★ Favoritos",eua:"🇺🇸 EUA",brasil:"🇧🇷 Brasil",europa:"🇪🇺 Europa",asia:"🌏 Ásia",mundo:"🌐 Commodities & Cripto"};
+const $=id=>document.getElementById(id),INT=600;
+let D=null,reg=(location.hash.slice(1)in R)?location.hash.slice(1):"todos",left=INT;
+let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
+const nf=(v,d=2)=>v==null?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function ago(t){const m=Math.round((Date.now()-new Date(t))/6e4);return m<1?"agora":m<60?m+" min":m<1440?Math.round(m/60)+" h":Math.round(m/1440)+" d"}
+function spark(a,up){if(!a||a.length<2)return"";const lo=Math.min(...a),hi=Math.max(...a),r=hi-lo||1;
+ return`<svg viewBox="0 0 70 30"><polyline fill="none" stroke="var(--${up?"up":"dn"})" stroke-width="1.6" points="${a.map((v,i)=>(i/(a.length-1)*70).toFixed(1)+","+(28-(v-lo)/r*26).toFixed(1)).join(" ")}"/></svg>`}
+function nav(){$("nav").innerHTML=Object.entries(R).map(([k,v])=>`<button data-k="${k}" class="${k==reg?"on":""}">${v}</button>`).join("")}
+function render(){
+ if(!D)return;const Q=D.quotes||[];
+ const qs=Q.filter(q=>reg=="todos"||(reg=="fav"?fav.includes(q.sym):q.region==reg));
+ $("mk").innerHTML=qs.map(q=>{const u=(q.pct||0)>=0;return`<div class="q"><button class="f ${fav.includes(q.sym)?"on":""}" data-s="${q.sym}" aria-label="Favoritar">★</button><div class="n">${esc(q.name)}</div><div class="p">${nf(q.price,q.price<10?4:2)}</div><div class="c ${u?"up":"dn"}">${u?"▲":"▼"} ${nf(q.pct)}%</div>${spark(q.spark,u)}</div>`}).join("")||`<p class="st">Sem dados nesta seção.</p>`;
+ $("tick").innerHTML=Q.filter(q=>["^GSPC","^IXIC","^BVSP","BRL=X","CL=F","BTC-USD"].includes(q.sym)).map(q=>`<span>${esc(q.name)} <b>${nf(q.price)}</b> <span class="${q.pct>=0?"up":"dn"}">${nf(q.pct)}%</span></span>`).join("");
+ $("mc").innerHTML=(D.macro||[]).map(m=>`<div><span>${esc(m.name)}</span><b>${nf(m.value,m.value<100?2:2)} <small class="st">${m.date}</small></b></div>`).join("")||`<p class="st">Indisponível.</p>`;
+ const s=$("q").value.toLowerCase();
+ const ns=(D.news||[]).filter(n=>(reg=="todos"||reg=="fav"||n.region==reg||(reg=="mundo"&&n.region=="mundo"))&&(!s||n.title.toLowerCase().includes(s))).slice(0,60);
+ $("nw").innerHTML=ns.map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">${esc(n.title)}<div class="meta"><span class="tag">${R[n.region].replace(/^\S+ /,"")}</span>${esc(n.source)} · ${ago(n.ts)}</div></a>`).join("")||`<p class="st" style="padding:14px">Nenhuma notícia encontrada.</p>`;
+}
+async function load(){
+ try{const r=await fetch("data/data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render()}catch(e){}
+ left=INT;
+}
+setInterval(()=>{left--;if(left<=0)load();if(D&&D.updated){const m=Math.round((Date.now()-new Date(D.updated))/6e4);
+ $("st").textContent=`Dados de ${m<1?"agora":m+" min atrás"} · próxima checagem em ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`}},1000);
+document.addEventListener("click",e=>{
+ const b=e.target.closest("[data-k]");if(b){reg=b.dataset.k;history.replaceState(0,"","#"+reg);nav();render()}
+ const f=e.target.closest("[data-s]");if(f){const s=f.dataset.s;fav=fav.includes(s)?fav.filter(x=>x!=s):[...fav,s];try{localStorage.setItem("fav",JSON.stringify(fav))}catch(e){}render()}});
+$("q").oninput=render;$("rf").onclick=load;
+$("th").onclick=()=>{const d=document.documentElement,t=d.dataset.theme=="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("th",t)}catch(e){}};
+try{const t=localStorage.getItem("th")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");document.documentElement.dataset.theme=t}catch(e){}
+addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h in R){reg=h;nav();render()}});
+nav();load();
+</script>
+</body>
+</html>
