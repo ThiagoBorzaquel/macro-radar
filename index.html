@@ -46,7 +46,7 @@ footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
 <body>
 <header><div class="w">
  <div class="top"><span class="logo">📈 Macro<b>Radar</b></span><span class="sp"></span>
-  <span class="st" id="st">carregando…</span><button class="btn" id="rf" title="Atualizar agora">⟳</button><button class="btn" id="th" title="Tema">◐</button></div>
+  <span class="st" id="st">carregando…</span><button class="btn" id="rf" type="button" aria-label="Recarregar os dados publicados" title="Recarregar os dados publicados">⟳</button><a class="btn" href="https://github.com/ThiagoBorzaquel/macro-radar/actions/workflows/update.yml" target="_blank" rel="noopener noreferrer" title="Abrir o GitHub Actions para iniciar uma coleta manual">Executar coleta</a><button class="btn" id="th" type="button" title="Tema">◐</button></div>
  <nav id="nav"></nav>
 </div><div class="w tick" id="tick" aria-label="Destaques"></div></header>
 <main class="w">
@@ -64,6 +64,7 @@ footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
 <script>
 const R={todos:"Todos",fav:"★ Favoritos",eua:"🇺🇸 EUA",brasil:"🇧🇷 Brasil",europa:"🇪🇺 Europa",asia:"🌏 Ásia",mundo:"🌐 Commodities & Cripto"};
 const $=id=>document.getElementById(id),INT=600;
+const DATA_URL="data/data.json";
 let D=null,reg=(location.hash.slice(1)in R)?location.hash.slice(1):"todos",left=INT;
 let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
 const nf=(v,d=2)=>v==null?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -83,7 +84,7 @@ function render(){
  $("nw").innerHTML=ns.map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">${esc(n.title)}<div class="meta"><span class="tag">${R[n.region].replace(/^\S+ /,"")}</span>${esc(n.source)} · ${ago(n.ts)}</div></a>`).join("")||`<p class="st" style="padding:14px">Nenhuma notícia encontrada.</p>`;
 }
 async function load(){
- try{const r=await fetch("data/data.json?t="+Date.now(),{cache:"no-store"});D=await r.json();render()}catch(e){}
+ try{const r=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});D=await r.json();render()}catch(e){}
  left=INT;
 }
 setInterval(()=>{left--;if(left<=0)load();if(D&&D.updated){const m=Math.round((Date.now()-new Date(D.updated))/6e4);

@@ -14,7 +14,14 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python scripts/update.py
-      - run: mkdir _site && cp -r index.html data sitemap.xml robots.txt _site/
+      - name: Prepare site
+        env:
+          DATA_VERSION: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          mkdir -p _site/data
+          cp sitemap.xml robots.txt _site/
+          cp data/data.json "_site/data/data-${DATA_VERSION}.json"
+          sed "s|data/data.json|data/data-${DATA_VERSION}.json|g" index.html > _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with: {path: _site}
       - id: d
