@@ -46,7 +46,7 @@ footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
 <body>
 <header><div class="w">
  <div class="top"><span class="logo">📈 Macro<b>Radar</b></span><span class="sp"></span>
-  <span class="st" id="st">carregando…</span><button class="btn" id="rf" type="button" aria-label="Recarregar os dados publicados" title="Recarregar os dados publicados">⟳</button><a class="btn" href="https://github.com/ThiagoBorzaquel/macro-radar/actions/workflows/update.yml" target="_blank" rel="noopener noreferrer" title="Abrir o GitHub Actions para iniciar uma coleta manual">Executar coleta</a><button class="btn" id="th" type="button" title="Tema">◐</button></div>
+  <span class="st" id="st">carregando…</span><button class="btn" id="th" type="button" title="Tema">◐</button></div>
  <nav id="nav"></nav>
 </div><div class="w tick" id="tick" aria-label="Destaques"></div></header>
 <main class="w">
@@ -65,7 +65,7 @@ footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
 const R={todos:"Todos",fav:"★ Favoritos",eua:"🇺🇸 EUA",brasil:"🇧🇷 Brasil",europa:"🇪🇺 Europa",asia:"🌏 Ásia",mundo:"🌐 Commodities & Cripto"};
 const $=id=>document.getElementById(id),INT=600;
 const DATA_URL="data/data.json";
-let D=null,reg=(location.hash.slice(1)in R)?location.hash.slice(1):"todos",left=INT;
+let D=null,reg=(location.hash.slice(1)in R)?location.hash.slice(1):"todos",left=INT,loading=false,loadError=false;
 let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
 const nf=(v,d=2)=>v==null?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -83,16 +83,30 @@ function render(){
  const ns=(D.news||[]).filter(n=>(reg=="todos"||reg=="fav"||n.region==reg||(reg=="mundo"&&n.region=="mundo"))&&(!s||n.title.toLowerCase().includes(s))).slice(0,60);
  $("nw").innerHTML=ns.map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">${esc(n.title)}<div class="meta"><span class="tag">${R[n.region].replace(/^\S+ /,"")}</span>${esc(n.source)} · ${ago(n.ts)}</div></a>`).join("")||`<p class="st" style="padding:14px">Nenhuma notícia encontrada.</p>`;
 }
-async function load(){
- try{const r=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});D=await r.json();render()}catch(e){}
- left=INT;
+function updateStatus(){
+ if(!D)return;const m=Math.round((Date.now()-new Date(D.updated))/6e4);
+ $("st").textContent=`Dados de ${m<1?"agora":m+" min atrás"} · próxima checagem em ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;
 }
-setInterval(()=>{left--;if(left<=0)load();if(D&&D.updated){const m=Math.round((Date.now()-new Date(D.updated))/6e4);
- $("st").textContent=`Dados de ${m<1?"agora":m+" min atrás"} · próxima checagem em ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`}},1000);
+async function load(){
+ if(loading)return;loading=true;loadError=false;$("st").textContent="Atualizando dados…";
+ try{
+  const r=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
+  const data=await r.json();
+  if(!data||!Array.isArray(data.quotes)||!Array.isArray(data.macro)||!Array.isArray(data.news))throw new Error("Formato de dados inválido");
+  D=data;render();
+ }catch(e){
+  loadError=true;console.error("Falha ao atualizar os dados.",e);$("st").textContent="Falha ao carregar os dados";
+ }finally{
+  loading=false;left=INT;
+  if(!loadError)updateStatus();
+ }
+}
+setInterval(()=>{left--;if(left<=0)load();if(D&&!loading&&!loadError)updateStatus()},1000);
 document.addEventListener("click",e=>{
  const b=e.target.closest("[data-k]");if(b){reg=b.dataset.k;history.replaceState(0,"","#"+reg);nav();render()}
  const f=e.target.closest("[data-s]");if(f){const s=f.dataset.s;fav=fav.includes(s)?fav.filter(x=>x!=s):[...fav,s];try{localStorage.setItem("fav",JSON.stringify(fav))}catch(e){}render()}});
-$("q").oninput=render;$("rf").onclick=load;
+$("q").oninput=render;
 $("th").onclick=()=>{const d=document.documentElement,t=d.dataset.theme=="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("th",t)}catch(e){}};
 try{const t=localStorage.getItem("th")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");document.documentElement.dataset.theme=t}catch(e){}
 addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h in R){reg=h;nav();render()}});
