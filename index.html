@@ -26,6 +26,7 @@ header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px 
 .sp{flex:1}.st{font-size:12px;color:var(--mu)}button,input{font:inherit;color:var(--tx)}
 .btn{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;cursor:pointer}
 nav{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px}nav button{white-space:nowrap;background:none;border:1px solid var(--bd);border-radius:99px;padding:5px 13px;cursor:pointer}
+.lang{display:flex;gap:3px;padding:3px;background:var(--bg);border:1px solid var(--bd);border-radius:9px}.lang button{border:0;background:transparent;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:13px;color:var(--mu)}.lang button[aria-pressed=true]{background:var(--ac);color:#fff}
 nav button.on{background:var(--ac);border-color:var(--ac);color:#fff}
 .tick{display:flex;gap:22px;overflow-x:auto;padding:8px 0;font-size:13px;white-space:nowrap}
 h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:22px 0 10px}
@@ -46,49 +47,105 @@ footer{color:var(--mu);font-size:12px;padding:26px 0 40px}
 <body>
 <header><div class="w">
  <div class="top"><span class="logo">📈 Macro<b>Radar</b></span><span class="sp"></span>
-  <span class="st" id="st">carregando…</span><button class="btn" id="th" type="button" title="Tema">◐</button></div>
+  <span class="st" id="st">carregando…</span><div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="pt" aria-pressed="true">🇧🇷 PT</button><button type="button" data-lang="en" aria-pressed="false">🇺🇸 EN</button></div><a class="btn" id="buy-book" href="https://www.amazon.com.br/dp/B0DVZLY41S" target="_blank" rel="noopener noreferrer">Comprar o livro ↗</a><a class="btn" id="contact" href="mailto:thiago.investiment@hotmail.com">Contato</a><button class="btn" id="th" type="button" title="Tema">◐</button></div>
  <nav id="nav"></nav>
 </div><div class="w tick" id="tick" aria-label="Destaques"></div></header>
 <main class="w">
- <h1 style="font-size:22px;margin:18px 0 0">Economia global em tempo real</h1>
- <p class="st">Índices, câmbio, commodities e notícias com foco em EUA e Brasil. Fontes públicas, atualização a cada 10 minutos.</p>
- <h2>Mercados</h2><div class="grid" id="mk"></div>
+ <h1 id="headline" style="font-size:22px;margin:18px 0 0">Economia global em tempo real</h1>
+ <p class="st" id="intro">Índices, câmbio, commodities e notícias com foco em EUA e Brasil. Fontes públicas, atualização a cada 10 minutos.</p>
+ <h2 id="markets-heading">Mercados</h2><div class="grid" id="mk"></div>
  <div class="cols">
-  <section><h2>Notícias</h2><input type="search" id="q" placeholder="Buscar notícias (ex.: Fed, Selic, petróleo)…" aria-label="Buscar"><div class="news" id="nw"></div></section>
-  <aside><h2>Brasil · Banco Central</h2><div class="mac" id="mc"></div><h2>Sobre</h2>
-   <p class="st">Cotações: Yahoo Finance (gráfico público, pode ter atraso de ~15 min). Macro: API SGS do Banco Central do Brasil. Notícias: RSS públicos (BBC, CNBC, G1, InfoMoney, Google News). Os links levam à fonte original. Conteúdo informativo, não é recomendação de investimento.</p></aside>
+  <section><h2 id="news-heading">Notícias</h2><input type="search" id="q" placeholder="Buscar notícias (ex.: Fed, Selic, petróleo)…" aria-label="Buscar"><div class="news" id="nw"></div></section>
+  <aside><h2 id="macro-heading">Brasil · Banco Central</h2><div class="mac" id="mc"></div><h2 id="about-heading">Sobre</h2>
+   <p class="st" id="about-copy">Cotações: Yahoo Finance (gráfico público, pode ter atraso de ~15 min). Macro: API SGS do Banco Central do Brasil. Notícias: RSS públicos (BBC, CNBC, G1, InfoMoney, Google News). Os links levam à fonte original. Conteúdo informativo, não é recomendação de investimento.</p></aside>
  </div>
- <noscript>Ative o JavaScript para ver os dados de mercado.</noscript>
+ <noscript id="noscript">Ative o JavaScript para ver os dados de mercado.</noscript>
 </main>
-<footer class="w">© Macro Radar · Dados públicos de terceiros; sem garantia de exatidão ou disponibilidade.</footer>
+<footer class="w" id="footer">© Macro Radar · Dados públicos de terceiros; sem garantia de exatidão ou disponibilidade.</footer>
 <script>
-const R={todos:"Todos",fav:"★ Favoritos",eua:"🇺🇸 EUA",brasil:"🇧🇷 Brasil",europa:"🇪🇺 Europa",asia:"🌏 Ásia",mundo:"🌐 Commodities & Cripto"};
+const REGIONS=["todos","fav","eua","brasil","europa","asia","mundo"];
+const TEXT={
+ pt:{
+  regions:{todos:"Todos",fav:"★ Favoritos",eua:"🇺🇸 EUA",brasil:"🇧🇷 Brasil",europa:"🇪🇺 Europa",asia:"🌏 Ásia",mundo:"🌐 Commodities & Cripto"},
+  loading:"carregando…",updating:"Atualizando dados…",loadError:"Falha ao carregar os dados",
+  status:(time,next)=>`Dados de ${time} · próxima checagem em ${next}`,
+  title:"Macro Radar — Economia global em tempo real: EUA, Brasil, Europa e Ásia",
+  description:"Índices globais, câmbio, commodities, cripto e notícias de economia com foco em EUA e Brasil. Dados públicos atualizados a cada 10 minutos.",
+  buyBook:"Comprar o livro ↗",contact:"Contato",theme:"Tema",highlights:"Destaques",headline:"Economia global em tempo real",
+  intro:"Índices, câmbio, commodities e notícias com foco em EUA e Brasil. Fontes públicas, atualização a cada 10 minutos.",
+  markets:"Mercados",news:"Notícias",search:"Buscar notícias (ex.: Fed, Selic, petróleo)…",searchLabel:"Buscar",
+  macro:"Brasil · Banco Central",about:"Sobre",
+  aboutCopy:"Cotações: Yahoo Finance (gráfico público, pode ter atraso de ~15 min). Macro: API SGS do Banco Central do Brasil. Notícias: RSS públicos (BBC, CNBC, G1, InfoMoney, Google News). Os links levam à fonte original. Conteúdo informativo, não é recomendação de investimento.",
+  noData:"Sem dados nesta seção.",unavailable:"Indisponível.",noNews:"Nenhuma notícia encontrada.",
+  favorite:"Favoritar",noscript:"Ative o JavaScript para ver os dados de mercado.",
+  footer:"© Macro Radar · Dados públicos de terceiros; sem garantia de exatidão ou disponibilidade.",
+  ageNow:"agora",minute:"min",hour:"h",day:"d"
+ },
+ en:{
+  regions:{todos:"All",fav:"★ Favorites",eua:"🇺🇸 U.S.",brasil:"🇧🇷 Brazil",europa:"🇪🇺 Europe",asia:"🌏 Asia",mundo:"🌐 Commodities & Crypto"},
+  loading:"loading…",updating:"Updating data…",loadError:"Failed to load data",
+  status:(time,next)=>`Data ${time} · next check in ${next}`,
+  title:"Macro Radar — Global economy in real time: U.S., Brazil, Europe and Asia",
+  description:"Global indices, currencies, commodities, crypto and economic news focused on the U.S. and Brazil. Public data updated every 10 minutes.",
+  buyBook:"Buy the book ↗",contact:"Contact",theme:"Theme",highlights:"Highlights",headline:"Global economy in real time",
+  intro:"Indices, currencies, commodities and news focused on the U.S. and Brazil. Public sources, updated every 10 minutes.",
+  markets:"Markets",news:"News",search:"Search news (e.g., Fed, interest rates, oil)…",searchLabel:"Search",
+  macro:"Brazil · Central Bank",about:"About",
+  aboutCopy:"Quotes: Yahoo Finance (public chart, may be delayed by ~15 min). Macro data: SGS API from the Central Bank of Brazil. News: public RSS feeds (BBC, CNBC, G1, InfoMoney, Google News). Links lead to the original source. For informational purposes only; not investment advice.",
+  noData:"No data in this section.",unavailable:"Unavailable.",noNews:"No news found.",
+  favorite:"Add to favorites",noscript:"Enable JavaScript to view market data.",
+  footer:"© Macro Radar · Public third-party data; accuracy or availability is not guaranteed.",
+  ageNow:"now",minute:"min",hour:"h",day:"d"
+ }
+};
 const $=id=>document.getElementById(id),INT=600;
 const DATA_URL=location.hostname.endsWith(".github.io")||["localhost","127.0.0.1"].includes(location.hostname)?"data/data.json":"/api/data";
-let D=null,reg=(location.hash.slice(1)in R)?location.hash.slice(1):"todos",left=INT,loading=false,loadError=false;
+let lang="pt";try{lang=localStorage.getItem("lang")==="en"?"en":"pt"}catch(e){}
+let D=null,reg=REGIONS.includes(location.hash.slice(1))?location.hash.slice(1):"todos",left=INT,loading=false,loadError=false;
 let fav=[];try{fav=JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){}
-const nf=(v,d=2)=>v==null?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const nf=(v,d=2)=>v==null?"—":v.toLocaleString(lang==="pt"?"pt-BR":"en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function ago(t){const m=Math.round((Date.now()-new Date(t))/6e4);return m<1?"agora":m<60?m+" min":m<1440?Math.round(m/60)+" h":Math.round(m/1440)+" d"}
+function ago(t){const m=Math.round((Date.now()-new Date(t))/6e4),T=TEXT[lang];return m<1?T.ageNow:m<60?m+" "+T.minute:m<1440?Math.round(m/60)+" "+T.hour:Math.round(m/1440)+" "+T.day}
 function spark(a,up){if(!a||a.length<2)return"";const lo=Math.min(...a),hi=Math.max(...a),r=hi-lo||1;
  return`<svg viewBox="0 0 70 30"><polyline fill="none" stroke="var(--${up?"up":"dn"})" stroke-width="1.6" points="${a.map((v,i)=>(i/(a.length-1)*70).toFixed(1)+","+(28-(v-lo)/r*26).toFixed(1)).join(" ")}"/></svg>`}
-function nav(){$("nav").innerHTML=Object.entries(R).map(([k,v])=>`<button data-k="${k}" class="${k==reg?"on":""}">${v}</button>`).join("")}
+function nav(){const R=TEXT[lang].regions;$("nav").innerHTML=Object.entries(R).map(([k,v])=>`<button data-k="${k}" class="${k==reg?"on":""}">${v}</button>`).join("")}
+function applyLanguage(){
+ const T=TEXT[lang],meta=document.querySelector('meta[name="description"]');
+ document.documentElement.lang=lang==="pt"?"pt-BR":"en";
+ document.title=T.title;meta.content=T.description;
+ $("buy-book").textContent=T.buyBook;
+ $("buy-book").href=lang==="en"?"https://www.amazon.com/dp/B0DWG3FSG5":"https://www.amazon.com.br/dp/B0DVZLY41S";
+ $("contact").textContent=T.contact;$("th").title=T.theme;$("tick").setAttribute("aria-label",T.highlights);
+ $("headline").textContent=T.headline;$("intro").textContent=T.intro;
+ $("markets-heading").textContent=T.markets;$("news-heading").textContent=T.news;
+ $("q").placeholder=T.search;$("q").setAttribute("aria-label",T.searchLabel);
+ $("macro-heading").textContent=T.macro;$("about-heading").textContent=T.about;
+ $("about-copy").textContent=T.aboutCopy;$("noscript").textContent=T.noscript;$("footer").textContent=T.footer;
+ document.querySelectorAll("[data-lang]").forEach(button=>button.setAttribute("aria-pressed",button.dataset.lang===lang?"true":"false"));
+ nav();render();
+ if(loading)$("st").textContent=T.updating;
+ else if(loadError)$("st").textContent=T.loadError;
+ else if(D)updateStatus();
+ else $("st").textContent=T.loading;
+}
 function render(){
  if(!D)return;const Q=D.quotes||[];
  const qs=Q.filter(q=>reg=="todos"||(reg=="fav"?fav.includes(q.sym):q.region==reg));
- $("mk").innerHTML=qs.map(q=>{const u=(q.pct||0)>=0;return`<div class="q"><button class="f ${fav.includes(q.sym)?"on":""}" data-s="${q.sym}" aria-label="Favoritar">★</button><div class="n">${esc(q.name)}</div><div class="p">${nf(q.price,q.price<10?4:2)}</div><div class="c ${u?"up":"dn"}">${u?"▲":"▼"} ${nf(q.pct)}%</div>${spark(q.spark,u)}</div>`}).join("")||`<p class="st">Sem dados nesta seção.</p>`;
+ $("mk").innerHTML=qs.map(q=>{const u=(q.pct||0)>=0;return`<div class="q"><button class="f ${fav.includes(q.sym)?"on":""}" data-s="${q.sym}" aria-label="${TEXT[lang].favorite}">★</button><div class="n">${esc(q.name)}</div><div class="p">${nf(q.price,q.price<10?4:2)}</div><div class="c ${u?"up":"dn"}">${u?"▲":"▼"} ${nf(q.pct)}%</div>${spark(q.spark,u)}</div>`}).join("")||`<p class="st">${TEXT[lang].noData}</p>`;
  $("tick").innerHTML=Q.filter(q=>["^GSPC","^IXIC","^BVSP","BRL=X","CL=F","BTC-USD"].includes(q.sym)).map(q=>`<span>${esc(q.name)} <b>${nf(q.price)}</b> <span class="${q.pct>=0?"up":"dn"}">${nf(q.pct)}%</span></span>`).join("");
- $("mc").innerHTML=(D.macro||[]).map(m=>`<div><span>${esc(m.name)}</span><b>${nf(m.value,m.value<100?2:2)} <small class="st">${m.date}</small></b></div>`).join("")||`<p class="st">Indisponível.</p>`;
+ $("mc").innerHTML=(D.macro||[]).map(m=>`<div><span>${esc(m.name)}</span><b>${nf(m.value,m.value<100?2:2)} <small class="st">${m.date}</small></b></div>`).join("")||`<p class="st">${TEXT[lang].unavailable}</p>`;
  const s=$("q").value.toLowerCase();
  const ns=(D.news||[]).filter(n=>(reg=="todos"||reg=="fav"||n.region==reg||(reg=="mundo"&&n.region=="mundo"))&&(!s||n.title.toLowerCase().includes(s))).slice(0,60);
- $("nw").innerHTML=ns.map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">${esc(n.title)}<div class="meta"><span class="tag">${R[n.region].replace(/^\S+ /,"")}</span>${esc(n.source)} · ${ago(n.ts)}</div></a>`).join("")||`<p class="st" style="padding:14px">Nenhuma notícia encontrada.</p>`;
+ const R=TEXT[lang].regions;
+ $("nw").innerHTML=ns.map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener noreferrer">${esc(n.title)}<div class="meta"><span class="tag">${R[n.region].replace(/^\S+ /,"")}</span>${esc(n.source)} · ${ago(n.ts)}</div></a>`).join("")||`<p class="st" style="padding:14px">${TEXT[lang].noNews}</p>`;
 }
 function updateStatus(){
  if(!D)return;const m=Math.round((Date.now()-new Date(D.updated))/6e4);
- $("st").textContent=`Dados de ${m<1?"agora":m+" min atrás"} · próxima checagem em ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;
+ const T=TEXT[lang],time=m<1?T.ageNow:lang==="pt"?m+" min atrás":m+" min ago";
+ $("st").textContent=T.status(time,`${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`);
 }
 async function load(){
- if(loading)return;loading=true;loadError=false;$("st").textContent="Atualizando dados…";
+ if(loading)return;loading=true;loadError=false;$("st").textContent=TEXT[lang].updating;
  try{
   const isStaticData=DATA_URL.endsWith(".json");
   const r=await fetch(isStaticData?DATA_URL+"?t="+Date.now():DATA_URL,{cache:isStaticData?"no-store":"default"});
@@ -97,7 +154,7 @@ async function load(){
   if(!data||!Array.isArray(data.quotes)||!Array.isArray(data.macro)||!Array.isArray(data.news))throw new Error("Formato de dados inválido");
   D=data;render();
  }catch(e){
-  loadError=true;console.error("Falha ao atualizar os dados.",e);$("st").textContent="Falha ao carregar os dados";
+  loadError=true;console.error("Falha ao atualizar os dados.",e);$("st").textContent=TEXT[lang].loadError;
  }finally{
   loading=false;left=INT;
   if(!loadError)updateStatus();
@@ -105,13 +162,14 @@ async function load(){
 }
 setInterval(()=>{left--;if(left<=0)load();if(D&&!loading&&!loadError)updateStatus()},1000);
 document.addEventListener("click",e=>{
+ const language=e.target.closest("[data-lang]");if(language&&language.dataset.lang!==lang){lang=language.dataset.lang;try{localStorage.setItem("lang",lang)}catch(e){}applyLanguage()}
  const b=e.target.closest("[data-k]");if(b){reg=b.dataset.k;history.replaceState(0,"","#"+reg);nav();render()}
  const f=e.target.closest("[data-s]");if(f){const s=f.dataset.s;fav=fav.includes(s)?fav.filter(x=>x!=s):[...fav,s];try{localStorage.setItem("fav",JSON.stringify(fav))}catch(e){}render()}});
 $("q").oninput=render;
 $("th").onclick=()=>{const d=document.documentElement,t=d.dataset.theme=="dark"?"light":"dark";d.dataset.theme=t;try{localStorage.setItem("th",t)}catch(e){}};
 try{const t=localStorage.getItem("th")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");document.documentElement.dataset.theme=t}catch(e){}
-addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h in R){reg=h;nav();render()}});
-nav();load();
+addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(REGIONS.includes(h)){reg=h;nav();render()}});
+applyLanguage();load();
 </script>
 </body>
 </html>
