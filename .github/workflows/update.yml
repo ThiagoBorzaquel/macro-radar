@@ -24,5 +24,7 @@ jobs:
           sed "s|data/data.json|data/data-${DATA_VERSION}.json|g" index.html > _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with: {path: _site}
+      - name: Wait for Pages artifact availability
+        run: sleep 5
       - id: d
         uses: actions/deploy-pages@v4
